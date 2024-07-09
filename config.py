@@ -6,6 +6,8 @@ min_duration = 0 # Min. duration of a QSO to qualify for a push notification
 min_silence = 300 # Min. time in seconds after the last QSO before a new push notification will be send
 verbose = True # Enable extra messages (console only)
 emit_sound = True
+open_webbrowser = True
+url_to_open = "https://www.google.com" # PUT YOUR URL IN HERE!!!!!
 
 # Pushover configuration
 pushover = False # Enable or disable notifications via Pushover
