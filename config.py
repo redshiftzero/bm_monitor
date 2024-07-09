@@ -5,6 +5,7 @@ noisy_calls = ["L1DHAM", "N0CALL", "N0C4LL"] # Noisy calls signs that will be ig
 min_duration = 0 # Min. duration of a QSO to qualify for a push notification
 min_silence = 300 # Min. time in seconds after the last QSO before a new push notification will be send
 verbose = True # Enable extra messages (console only)
+emit_sound = True
 
 # Pushover configuration
 pushover = False # Enable or disable notifications via Pushover

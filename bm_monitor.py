@@ -23,6 +23,7 @@ import datetime as dt
 import time
 import socketio
 import http.client, urllib
+import playsound
 
 # libary only needed if Discord is configured in config.py
 if cfg.discord:
@@ -30,10 +31,10 @@ if cfg.discord:
 
 # libraries only needed if Telegram is configured in config.py
 # if cfg.telegram:
-#     import telebot 
-#     from telethon.sync import TelegramClient 
-#     from telethon.tl.types import InputPeerUser, InputPeerChannel 
-#     from telethon import TelegramClient, sync, events 
+#     import telebot
+#     from telethon.sync import TelegramClient
+#     from telethon.tl.types import InputPeerUser, InputPeerChannel
+#     from telethon import TelegramClient, sync, events
 
 # libraries only needed if dapnet or telegram is configured in config.py
 if cfg.dapnet or cfg.telegram:
@@ -64,17 +65,17 @@ def push_pushover(msg):
 
 # Send push notification via Telegram. Disabled if not configured in config.py
 # def push_telegram(msg):
-#     client = TelegramClient('bm_bot', cfg.telegram_api_id, cfg.telegram_api_hash) 
-#     client.connect() 
-#     if not client.is_user_authorized(): 
-#         client.send_code_request(cfg.phone) 
-#         client.sign_in(cfg.phone, input('Please enter the code which has been sent to your phone: ')) 
-#     try: 
-#         receiver = InputPeerUser('user_id', 'user_hash') 
-#         client.send_message(cfg.telegram_username, msg) 
-#     except Exception as e: 
-#         print(e); 
-#     client.disconnect() 
+#     client = TelegramClient('bm_bot', cfg.telegram_api_id, cfg.telegram_api_hash)
+#     client.connect()
+#     if not client.is_user_authorized():
+#         client.send_code_request(cfg.phone)
+#         client.sign_in(cfg.phone, input('Please enter the code which has been sent to your phone: '))
+#     try:
+#         receiver = InputPeerUser('user_id', 'user_hash')
+#         client.send_message(cfg.telegram_username, msg)
+#     except Exception as e:
+#         print(e);
+#     client.disconnect()
 
 def push_telegram(msg):
     telegram_url = "https://api.telegram.org/bot" + cfg.telegram_api_hash + "/sendmessage"
@@ -88,12 +89,12 @@ def push_telegram(msg):
 # send pager notification via DAPNET. Disabled if not configured in config.py
 def push_dapnet(msg):
     dapnet_json = json.dumps({"text": msg, "callSignNames": cfg.dapnet_callsigns, "transmitterGroupNames": [cfg.dapnet_txgroup], "emergency": True})
-    response = requests.post(cfg.dapnet_url, data=dapnet_json, auth=HTTPBasicAuth(cfg.dapnet_user,cfg.dapnet_pass)) 
+    response = requests.post(cfg.dapnet_url, data=dapnet_json, auth=HTTPBasicAuth(cfg.dapnet_user,cfg.dapnet_pass))
 
 # Send notification to Discord Channel via webhook
 def push_discord(wh_url, msg):
     webhook = DiscordWebhook(url=wh_url, content=msg)
-    response = webhook.execute()  
+    response = webhook.execute()
 
 def construct_message(c):
     tg = c["DestinationID"]
@@ -132,7 +133,7 @@ def on_mqtt(data):
 
     if cfg.verbose and callsign in cfg.noisy_calls:
         print("ignored noisy ham " + callsign)
-    
+
     elif event == 'Session-Stop' and callsign != '':
         # check if callsign is monitored, the transmission has already been finished
         # and the person was inactive for n seconds
@@ -173,6 +174,8 @@ def on_mqtt(data):
                 push_dapnet(construct_message(call))
             if cfg.discord:
                 push_discord(cfg.discord_wh_url, construct_message(call))
+            if cfg.emit_sound:
+                playsound.playsound('sounds/Sound4.wav');
 
 @sio.event
 def disconnect():
